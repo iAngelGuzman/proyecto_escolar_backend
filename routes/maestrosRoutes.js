@@ -11,10 +11,11 @@ router.get('/', async (req, res) => {
 
 // POST: Registrar maestro
 router.post('/', async (req, res) => {
-    const { nombre, apellido, email, telefono } = req.body;
+    const { nombre, apellido, email, telefono, password } = req.body;
+    const passwordFinal = password || '12345'; // contraseña por defecto 
     const { data, error } = await supabase
         .from('maestros')
-        .insert([{ nombre, apellido, email, telefono }]) 
+        .insert([{ nombre, apellido, email, telefono, password: passwordFinal }]) 
         .select();
     if (error) return res.status(500).json({ error: error.message });
     res.status(201).json(data);

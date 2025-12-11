@@ -8,6 +8,7 @@ const materiasRoutes = require('./routes/materiasRoutes');
 const turnosRoutes = require('./routes/turnosRoutes');
 const maestrosRoutes = require('./routes/maestrosRoutes');
 const asignacionesRoutes = require('./routes/asignacionesRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api/materias', materiasRoutes);
 app.use('/api/turnos', turnosRoutes);
 app.use('/api/maestros', maestrosRoutes);
 app.use('/api/asignaciones', asignacionesRoutes);
+app.use('/api/login', authRoutes);
 
 app.get('/', (req, res) => {
     res.send('Servidor Backend del Proyecto Escolar Funcionando.');
