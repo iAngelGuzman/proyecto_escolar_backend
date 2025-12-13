@@ -7,6 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface MaestroRepository extends JpaRepository<Maestro, Long> {
-    // Spring crea la consulta SQL automáticamente al ver "findByEmail"
+    // buscar por correo (se ocupa para el login)
     Optional<Maestro> findByEmail(String email); 
 }

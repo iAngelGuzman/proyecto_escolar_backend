@@ -20,24 +20,24 @@ public class AsignacionController {
     @Autowired private MateriaRepository materiaRepository;
     @Autowired private TurnoRepository turnoRepository;
 
-    // GET: Listar todas
+    // traer todas las asignaciones
     @GetMapping
     public List<Asignacion> getAll() {
         return asignacionRepository.findAll();
     }
 
-    // POST: Crear nueva asignación
+    // hacer alta de nueva asignacion, usamos map para recibir datos sin hacer otra clase
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Map<String, Object> payload) { // Usamos Object para evitar errores de cast
+    public ResponseEntity<?> create(@RequestBody Map<String, Object> payload) { 
         try {
             Asignacion nueva = new Asignacion();
             return guardarAsignacion(nueva, payload);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al crear la asignación: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error al crear: " + e.getMessage());
         }
     }
 
-    // PUT: Editar asignación existente
+    // modificar asignacion
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
         Optional<Asignacion> asignacionOpt = asignacionRepository.findById(id);
@@ -53,7 +53,7 @@ public class AsignacionController {
         }
     }
 
-    // DELETE: Eliminar asignación
+    // eliminar registro
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         if (!asignacionRepository.existsById(id)) {
@@ -63,7 +63,7 @@ public class AsignacionController {
         return ResponseEntity.ok().build();
     }
 
-    // Endpoint extra para obtener alumnos de un curso (que ya tenías)
+    // obtener lista de alumnos en esta asignacion
     @GetMapping("/{id}/alumnos")
     public ResponseEntity<?> getAlumnosDeAsignacion(@PathVariable Long id) {
         Optional<Asignacion> asignacionOpt = asignacionRepository.findById(id);
@@ -73,27 +73,27 @@ public class AsignacionController {
         return ResponseEntity.ok(asignacionOpt.get().getAlumnos());
     }
 
-    // --- MÉTODO AUXILIAR PARA EVITAR REPETIR CÓDIGO ---
+    // metodo auxiliar para no repetir codigo en create y update
     private ResponseEntity<?> guardarAsignacion(Asignacion asignacion, Map<String, Object> payload) {
-        // Conversión segura de IDs (acepta Integer o Long del JSON)
+        // conversion manual de ids para evitar errores de tipo
         Long maestroId = convertToLong(payload.get("maestro_id"));
         Long materiaId = convertToLong(payload.get("materia_id"));
         Long turnoId = convertToLong(payload.get("turno_id"));
 
         if (maestroId == null || materiaId == null || turnoId == null) {
-            return ResponseEntity.badRequest().body("Faltan datos (maestro_id, materia_id o turno_id)");
+            return ResponseEntity.badRequest().body("Faltan datos obligatorios");
         }
 
-        // Buscamos las entidades relacionadas
+        // validar que existan en la base de datos
         Optional<Maestro> maestroOpt = maestroRepository.findById(maestroId);
         Optional<Materia> materiaOpt = materiaRepository.findById(materiaId);
         Optional<Turno> turnoOpt = turnoRepository.findById(turnoId);
 
         if (maestroOpt.isEmpty() || materiaOpt.isEmpty() || turnoOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("El maestro, materia o turno especificado no existe.");
+            return ResponseEntity.badRequest().body("Datos invalidos (maestro, materia o turno no existen)");
         }
 
-        // Actualizamos la asignación
+        // actualizar relaciones
         asignacion.setMaestro(maestroOpt.get());
         asignacion.setMateria(materiaOpt.get());
         asignacion.setTurno(turnoOpt.get());
@@ -102,7 +102,7 @@ public class AsignacionController {
         return ResponseEntity.ok(saved);
     }
 
-    // Helper para convertir cualquier número del JSON a Long
+    // convertir numeros del json a long
     private Long convertToLong(Object o) {
         if (o instanceof Number) return ((Number) o).longValue();
         if (o instanceof String) return Long.parseLong((String) o);

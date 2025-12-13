@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabaseClient');
 
-// GET: Ver asignaciones con DATOS REALES (Joins)
+// traer asignaciones con toda la info (el join)
 router.get('/', async (req, res) => {
-    // Pedimos la asignación y los datos de las tablas relacionadas
+    // hacemos el select anidado para no ver solo numeros de id
     const { data, error } = await supabase
         .from('asignaciones')
         .select(`
@@ -18,9 +18,11 @@ router.get('/', async (req, res) => {
     res.json(data);
 });
 
-// POST: Crear asignación (Aquí sí enviamos IDs)
+// guardar una nueva asignacion
 router.post('/', async (req, res) => {
+    // aqui si ocupamos los ids para guardar la relacion
     const { maestro_id, materia_id, turno_id } = req.body;
+    
     const { data, error } = await supabase
         .from('asignaciones')
         .insert([{ maestro_id, materia_id, turno_id }])

@@ -5,16 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-// Este repositorio nos permite guardar y buscar notas en la base de datos sin escribir SQL manual.
 public interface CalificacionRepository extends JpaRepository<Calificacion, Long> {
 
-    // 1. Búsqueda Individual:
-    // Busca la calificación de UN alumno específico en UNA materia.
-    // Usamos Optional porque puede que el alumno aún no tenga nota asignada.
+    // buscar la nota de un alumno en especifico en esa clase regresa optional para validar facil si ya tiene o no
+    // regresa optional para validar facil si ya tiene o no
     Optional<Calificacion> findByAsignacionIdAndAlumnoId(Long asignacionId, Long alumnoId);
 
-    // 2. Búsqueda Grupal:
-    // Recupera la lista de TODAS las calificaciones de un curso.
-    // Esto se usa para pintar la tabla completa en la pantalla del profesor.
+    // traer todas las calificaciones del grupo
     List<Calificacion> findByAsignacionId(Long asignacionId);
 }

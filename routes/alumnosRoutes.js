@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabaseClient');
 
-// GET: Obtener alumnos
+// traer a todos los alumnos
 router.get('/', async (req, res) => {
     try {
         const { data, error } = await supabase.from('alumnos').select('*');
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST: Crear alumno 
+// guardar un nuevo alumno
 router.post('/', async (req, res) => {
     const { matricula, nombre, apellido, fecha_nacimiento, direccion } = req.body;
 

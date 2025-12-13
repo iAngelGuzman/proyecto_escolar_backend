@@ -13,17 +13,19 @@ public class MateriaController {
     @Autowired
     private MateriaRepository materiaRepository;
 
+    // traer todas las materias
     @GetMapping
     public List<Materia> getAll() {
         return materiaRepository.findAll();
     }
 
+    // guardar una nueva 
     @PostMapping
     public Materia create(@RequestBody Materia materia) {
         return materiaRepository.save(materia);
     }
 
-    // EDITAR MATERIA
+    // actualizar la info
     @PutMapping("/{id}")
     public Materia update(@PathVariable Long id, @RequestBody Materia materiaDetails) {
         return materiaRepository.findById(id)
@@ -36,7 +38,7 @@ public class MateriaController {
                 .orElse(null);
     }
 
-    // ELIMINAR MATERIA
+    // borrar materia
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         materiaRepository.deleteById(id);

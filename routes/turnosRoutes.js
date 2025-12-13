@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabaseClient');
 
-// GET: Ver turnos
+// traer los turnos disponibles
 router.get('/', async (req, res) => {
     try {
         const { data, error } = await supabase.from('turnos').select('*');
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST: Crear turno
+// agregar un turno nuevo
 router.post('/', async (req, res) => {
     const { nombre_turno } = req.body;
     try {

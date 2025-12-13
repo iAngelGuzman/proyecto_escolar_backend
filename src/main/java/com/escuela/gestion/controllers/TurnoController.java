@@ -13,17 +13,19 @@ public class TurnoController {
     @Autowired
     private TurnoRepository turnoRepository;
 
+    // ver todos los turnos disponibles
     @GetMapping
     public List<Turno> getAll() {
         return turnoRepository.findAll();
     }
 
+    // crear nuevo turno
     @PostMapping
     public Turno create(@RequestBody Turno turno) {
         return turnoRepository.save(turno);
     }
 
-    // EDITAR TURNO
+    // editar nombre del turno
     @PutMapping("/{id}")
     public Turno update(@PathVariable Long id, @RequestBody Turno turnoDetails) {
         return turnoRepository.findById(id)
@@ -34,7 +36,7 @@ public class TurnoController {
                 .orElse(null);
     }
 
-    // ELIMINAR TURNO
+    // eliminar turno
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         turnoRepository.deleteById(id);

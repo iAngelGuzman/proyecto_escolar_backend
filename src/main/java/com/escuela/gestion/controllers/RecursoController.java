@@ -23,14 +23,13 @@ public class RecursoController {
     @Autowired
     private AsignacionRepository asignacionRepository;
 
-    // GET: Obtener recursos de un curso
-    // Se ajusta a tu repositorio usando 'findByAsignacionId'
+    // traer los recursos de la materia
     @GetMapping("/asignaciones/{id}/recursos")
     public List<Recurso> getRecursosPorAsignacion(@PathVariable Long id) {
         return recursoRepository.findByAsignacionId(id);
     }
 
-    // POST: Crear nuevo recurso
+    // subir nuevo material
     @PostMapping("/recursos")
     public ResponseEntity<?> crearRecurso(@RequestBody Map<String, Object> payload) {
         try {
@@ -41,7 +40,7 @@ public class RecursoController {
         }
     }
 
-    // PUT: Editar recurso existente
+    // editar un recurso ya existente
     @PutMapping("/recursos/{id}")
     public ResponseEntity<?> editarRecurso(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
         return recursoRepository.findById(id)
@@ -55,7 +54,7 @@ public class RecursoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE: Eliminar recurso
+    // borrar
     @DeleteMapping("/recursos/{id}")
     public ResponseEntity<?> eliminarRecurso(@PathVariable Long id) {
         if (!recursoRepository.existsById(id)) {
@@ -65,13 +64,13 @@ public class RecursoController {
         return ResponseEntity.ok(Map.of("message", "Recurso eliminado"));
     }
 
-    // --- MÉTODO AUXILIAR PARA GUARDAR (Lógica común para Crear y Editar) ---
+    // metodo compartido para guardar porque sirve para create y update
     private ResponseEntity<?> guardarRecurso(Recurso recurso, Map<String, Object> payload) {
-        // 1. Validar datos obligatorios
+        // checar datos obligatorios
         String titulo = (String) payload.get("titulo");
-        String tipo = (String) payload.get("type"); // 'link' o 'file'
+        String tipo = (String) payload.get("type"); // para link o archivo
         
-        // Convertimos de forma segura el ID (puede venir como Integer o Long)
+        // conversion manual del id porque el json es engañoso con los tipos
         Object asignacionIdObj = payload.get("asignacionId");
         Long asignacionId = (asignacionIdObj instanceof Number) ? ((Number) asignacionIdObj).longValue() : Long.parseLong(asignacionIdObj.toString());
 
@@ -79,32 +78,31 @@ public class RecursoController {
             return ResponseEntity.badRequest().body(Map.of("error", "Faltan datos obligatorios (titulo, type)"));
         }
 
-        // 2. Asignar datos básicos
+        // datos basicos
         recurso.setTitulo(titulo);
         recurso.setTipo(tipo);
 
-        // 3. Lógica para diferenciar Link vs Archivo
+        // logica especifica segun el tipo de recurso
         if ("link".equals(tipo)) {
             String url = (String) payload.get("url");
             if (url == null || url.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "La URL es obligatoria para recursos tipo enlace"));
             }
             recurso.setUrl(url);
-            recurso.setArchivoBase64(null); // Limpiamos archivo si cambiaron a tipo link
+            recurso.setArchivoBase64(null); // si es link no ocupamos guardar archivo
         } else if ("file".equals(tipo)) {
             String base64 = (String) payload.get("archivoBase64");
-            // Solo actualizamos el archivo si viene uno nuevo. 
-            // Si es edición y no viene archivo, mantenemos el que ya estaba (si existe).
+            // solo cambiamos el archivo si el usuario subio uno nuevo, si no dejamos el anterior
             if (base64 != null && !base64.isEmpty()) {
                 recurso.setArchivoBase64(base64);
             } else if (recurso.getId() == null) { 
-                // Si es nuevo registro y no hay archivo
+                // si es nuevo a fuerza necesita archivo
                 return ResponseEntity.badRequest().body(Map.of("error", "El archivo es obligatorio"));
             }
-            recurso.setUrl(null); // Limpiamos URL si cambiaron a tipo file
+            recurso.setUrl(null); // limpiamos url si ahora es archivo
         }
 
-        // 4. Si es nuevo, asignamos fecha y relación con Asignación
+        // si es nuevo le ponemos fecha y lo ligamos a la materia
         if (recurso.getId() == null) {
             recurso.setCreatedAt(LocalDateTime.now());
             Asignacion asignacion = asignacionRepository.findById(asignacionId)
@@ -112,7 +110,6 @@ public class RecursoController {
             recurso.setAsignacion(asignacion);
         }
 
-        // 5. Guardar en BD
         Recurso guardado = recursoRepository.save(recurso);
         return ResponseEntity.ok(guardado);
     }

@@ -9,44 +9,43 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/alumnos")
-@CrossOrigin(origins = "*") // Permite que React se conecte sin problemas
+// esto es para react se conecte y no haya problema con el navegador por los puertos diferentes
+@CrossOrigin(origins = "*") 
 public class AlumnoController {
 
     @Autowired
     private AlumnoRepository alumnoRepository;
 
-    // GET: Obtener todos los alumnos
+    // traer toda la lista
     @GetMapping
     public List<Alumno> getAllAlumnos() {
         return alumnoRepository.findAll();
     }
 
-    // POST: Guardar un nuevo alumno
+    // dar de alta un alumno
     @PostMapping
     public Alumno createAlumno(@RequestBody Alumno alumno) {
         return alumnoRepository.save(alumno);
     }
 
-    // --- NUEVOS MÉTODOS PARA COMPLETAR EL CRUD ---
-
-    // PUT: Actualizar un alumno existente
+    // editar informacion del alumno
     @PutMapping("/{id}")
     public Alumno updateAlumno(@PathVariable Long id, @RequestBody Alumno alumnoDetails) {
         return alumnoRepository.findById(id)
                 .map(alumno -> {
-                    // Actualizamos los campos con la información que viene del frontend
+                    // pasamos los datos nuevos al objeto que ya teniamos
                     alumno.setMatricula(alumnoDetails.getMatricula());
                     alumno.setNombre(alumnoDetails.getNombre());
                     alumno.setApellido(alumnoDetails.getApellido());
                     alumno.setDireccion(alumnoDetails.getDireccion());
                     alumno.setFechaNacimiento(alumnoDetails.getFechaNacimiento());
                     
-                    return alumnoRepository.save(alumno); // Guardamos los cambios
+                    return alumnoRepository.save(alumno); 
                 })
-                .orElse(null); // Retorna null si no encuentra el ID (idealmente se maneja con excepción)
+                .orElse(null); // si no lo encuentra regresa nulo
     }
 
-    // DELETE: Eliminar un alumno
+    // borrar del sistema
     @DeleteMapping("/{id}")
     public void deleteAlumno(@PathVariable Long id) {
         alumnoRepository.deleteById(id);

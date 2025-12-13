@@ -13,17 +13,19 @@ public class MaestroController {
     @Autowired
     private MaestroRepository maestroRepository;
 
+    // traer lista de maestros
     @GetMapping
     public List<Maestro> getAll() {
         return maestroRepository.findAll();
     }
 
+    // registrar uno nuevo
     @PostMapping
     public Maestro create(@RequestBody Maestro maestro) {
         return maestroRepository.save(maestro);
     }
 
-    // EDITAR MAESTRO
+    // editar datos 
     @PutMapping("/{id}")
     public Maestro update(@PathVariable Long id, @RequestBody Maestro maestroDetails) {
         return maestroRepository.findById(id)
@@ -32,7 +34,8 @@ public class MaestroController {
                     maestro.setApellido(maestroDetails.getApellido());
                     maestro.setEmail(maestroDetails.getEmail());
                     maestro.setTelefono(maestroDetails.getTelefono());
-                    // Solo actualizamos la contraseña si viene una nueva (no está vacía)
+                    
+                    // si viene contraseña nueva la cambiamos, si no la dejamos igual
                     if (maestroDetails.getPassword() != null && !maestroDetails.getPassword().isEmpty()) {
                         maestro.setPassword(maestroDetails.getPassword());
                     }
@@ -41,7 +44,7 @@ public class MaestroController {
                 .orElse(null);
     }
 
-    // ELIMINAR MAESTRO
+    // borrar del sistema
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         maestroRepository.deleteById(id);

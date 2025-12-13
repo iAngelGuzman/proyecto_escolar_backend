@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 
-// Esta entidad representa el registro diario: si un alumno vino o no en una fecha específica.
+// registro diario de faltas y asistencias
 @Entity
 @Table(name = "asistencias")
 public class Asistencia {
@@ -12,24 +12,23 @@ public class Asistencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Aquí guardamos la fecha de la clase y el estado (Presente, Ausente o Retardo).
     private LocalDate fecha;
+    // valores posibles: presente, ausente, tardanza
     private String status; 
 
-    // Relación con el Alumno: ¿Quién asistió?
-    // @JsonIgnoreProperties sirve para evitar errores técnicos al convertir los datos a JSON.
+    // relacion con alumno sin esto explota al convertir a json por el lazy loading (bucle infinito)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alumno_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Alumno alumno;
 
-    // Relación con la Asignación: ¿A qué curso o materia pertenece esta asistencia?
+    // a que clase pertenece la asistencia
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asignacion_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Asignacion asignacion;
 
-    // Getters y Setters: Métodos necesarios para poder leer y guardar información en estos campos.
+    // getters y setters (lombok a veces da lata con relaciones lazy)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public LocalDate getFecha() { return fecha; }

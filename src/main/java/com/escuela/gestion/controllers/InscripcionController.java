@@ -22,13 +22,13 @@ public class InscripcionController {
     @Autowired
     private AlumnoRepository alumnoRepository;
 
-    // GET: Obtener IDs de alumnos ya inscritos en un curso (Para llenar los checkboxes)
+    // obtener ids de los que ya estan inscritos para marcar los checkboxes
     @GetMapping("/inscripciones/{asignacionId}")
     public ResponseEntity<?> obtenerInscritos(@PathVariable Long asignacionId) {
         Asignacion asignacion = asignacionRepository.findById(asignacionId)
                 .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
         
-        // Devolvemos solo los IDs para el frontend
+        // solo me interesan los ids para el front
         List<Long> inscritosIds = asignacion.getAlumnos().stream()
                 .map(Alumno::getId)
                 .collect(Collectors.toList());
@@ -36,14 +36,14 @@ public class InscripcionController {
         return ResponseEntity.ok(inscritosIds);
     }
 
-    // POST: Guardar la lista de alumnos en el curso (Sobreescribe la lista anterior)
+    // guardar la lista de alumnos (reemplaza la lista anterior)
     @PostMapping("/inscripciones")
     public ResponseEntity<?> inscribirAlumnos(@RequestBody Map<String, Object> payload) {
         try {
             Long asignacionId = Long.valueOf(payload.get("asignacionId").toString());
             List<Integer> alumnosIdsInt = (List<Integer>) payload.get("alumnoIds");
             
-            // Convertir lista de Integer a Long 
+            // el json manda enteros y java pide longs, asi que convertimos
             List<Long> alumnosIds = alumnosIdsInt.stream().map(Long::valueOf).collect(Collectors.toList());
 
             Asignacion asignacion = asignacionRepository.findById(asignacionId)
@@ -51,7 +51,7 @@ public class InscripcionController {
 
             List<Alumno> alumnosParaInscribir = alumnoRepository.findAllById(alumnosIds);
 
-            // Actualizamos la relación
+            // sobreescribimos la lista completa de inscritos
             asignacion.setAlumnos(alumnosParaInscribir);
             asignacionRepository.save(asignacion);
 

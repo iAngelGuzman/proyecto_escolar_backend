@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
-// Esta entidad representa la "Biblioteca": aquí se guardan los materiales de apoyo.
-// Puede ser un simple enlace (link) o un archivo real (PDF/Imagen).
+// tabla para guardar material de apoyo (pdfs o links)
 @Entity
 @Table(name = "recursos")
 public class Recurso {
@@ -15,24 +14,22 @@ public class Recurso {
 
     private String titulo;
     private String url;
-    private String tipo; // Define si es 'link' (enlace web) o 'file' (archivo subido)
+    private String tipo; // valores: 'link' o 'file'
 
-    // ¡Importante! Aquí guardamos el archivo PDF convertido en una cadena de texto larga.
-    // Usamos columnDefinition="TEXT" para permitir guardar textos muy grandes.
+    // guardamos el archivo directo en base64 para no configurar almacenamientos externos usamos TEXT porque el string sale enorme
     @Column(name = "archivo_base64", columnDefinition = "TEXT")
-    private String archivoBase64; // <--- NUEVO CAMPO PARA EL PDF
+    private String archivoBase64; 
     
-    // Guarda automáticamente la fecha y hora en que el profe subió el material.
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Conecta este material con un curso específico (para que no salga en otras materias).
+    // materia a la que pertenece el recurso
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asignacion_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Asignacion asignacion;
 
-    // Getters y Setters: Necesarios para que la aplicación lea y escriba estos datos.
+    // getters y setters 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitulo() { return titulo; }

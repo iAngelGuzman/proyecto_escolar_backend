@@ -25,7 +25,7 @@ public class CalificacionController {
     @Autowired
     private AlumnoRepository alumnoRepository;
 
-    // GET: Obtener lista de alumnos con su calificación (si la tienen)
+    // sacar lista de alumnos y ver si ya tienen calificacion
     @GetMapping("/asignaciones/{id}/alumnos-con-calificacion")
     public List<Map<String, Object>> obtenerAlumnosConNota(@PathVariable Long id) {
         Asignacion asignacion = asignacionRepository.findById(id)
@@ -42,10 +42,10 @@ public class CalificacionController {
             item.put("apellido", alumno.getApellido());
             item.put("matricula", alumno.getMatricula());
 
-            // Buscar si ya tiene calificación
+            // buscar si ya tiene calificacion guardada
             Optional<Calificacion> calif = calificacionRepository.findByAsignacionIdAndAlumnoId(id, alumno.getId());
             
-            // Si existe, ponemos el valor. Si no, null.
+            // si tiene nota la ponemos, si no se va nulo
             item.put("calificacion", calif.map(Calificacion::getValor).orElse(null));
             
             respuesta.add(item);
@@ -54,21 +54,21 @@ public class CalificacionController {
         return respuesta;
     }
 
-    // POST: Guardar o Actualizar calificación
+    // guardar o actualizar la nota
     @PostMapping("/calificaciones")
     public Map<String, String> guardarCalificacion(@RequestBody Map<String, Object> payload) {
         Long alumnoId = Long.valueOf(payload.get("alumnoId").toString());
         Long asignacionId = Long.valueOf(payload.get("asignacionId").toString());
         
-        // Manejo seguro de números (puede venir como entero o decimal)
+        // convertir a double porque a veces llega como int
         Double valor = Double.valueOf(payload.get("calificacion").toString());
 
-        // Buscar si existe para actualizar (Upsert)
+        // buscamos si ya existe para no duplicar
         Calificacion calificacion = calificacionRepository.findByAsignacionIdAndAlumnoId(asignacionId, alumnoId)
                 .orElse(new Calificacion());
 
         if (calificacion.getId() == null) {
-            // Si es nueva, asignamos las relaciones
+            // si es registro nuevo llenamos los datos
             Asignacion asig = asignacionRepository.findById(asignacionId).orElseThrow();
             Alumno alum = alumnoRepository.findById(alumnoId).orElseThrow();
             calificacion.setAsignacion(asig);

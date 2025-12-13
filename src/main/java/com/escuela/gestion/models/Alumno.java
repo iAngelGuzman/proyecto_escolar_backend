@@ -1,10 +1,11 @@
 package com.escuela.gestion.models;
 
 import jakarta.persistence.*;
-import lombok.Data; // Lombok genera getters y setters automáticamente
+import lombok.Data;
 import java.time.LocalDate;
 
-@Data // Esto crea getters, setters, toString, etc.
+// usamos lombok para no escribir mil getters y setters a mano
+@Data 
 @Entity
 @Table(name = "alumnos")
 public class Alumno {
@@ -13,6 +14,7 @@ public class Alumno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // la matricula no se puede repetir
     @Column(nullable = false, unique = true)
     private String matricula;
 

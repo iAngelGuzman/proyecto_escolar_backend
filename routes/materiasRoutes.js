@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabaseClient');
 
-// GET: Obtener todas las materias
+// ver catalogo de materias
 router.get('/', async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST: Registrar nueva materia
+// dar de alta una materia nueva
 router.post('/', async (req, res) => {
     const { nombre_materia, clave_materia, descripcion } = req.body;
 

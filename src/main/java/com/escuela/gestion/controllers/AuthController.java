@@ -12,13 +12,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/login")
-@CrossOrigin(origins = "*") // Permite que React se conecte
+@CrossOrigin(origins = "*") // permite conexion desde react
 public class AuthController {
 
     @Autowired
     private MaestroRepository maestroRepository;
 
-    // Clase auxiliar para recibir los datos del JSON (DTO)
+    // clase auxiliar para recibir los datos del json mas facil
     public static class LoginRequest {
         public String email;
         public String password;
@@ -28,7 +28,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Map<String, Object> response = new HashMap<>();
 
-        // 1. Verificación de ADMINISTRADOR (Hardcoded)
+        // 1. verificacion de admin (quemado en codigo por rapidez)
         if ("admin@escuela.com".equals(request.email) && "admin123".equals(request.password)) {
             Map<String, String> usuarioAdmin = new HashMap<>();
             usuarioAdmin.put("nombre", "Administrador");
@@ -39,21 +39,21 @@ public class AuthController {
             return ResponseEntity.ok(response);
         }
 
-        // 2. Verificación de DOCENTE (Base de Datos)
+        // 2. verificacion de docente en base de datos
         Optional<Maestro> maestroOpt = maestroRepository.findByEmail(request.email);
 
         if (maestroOpt.isPresent()) {
             Maestro maestro = maestroOpt.get();
-            // Comparamos contraseñas (En un caso real, aquí usarías BCrypt para encriptar)
+            // comparamos contraseñas directo (sin hash por ahora)
             if (maestro.getPassword() != null && maestro.getPassword().equals(request.password)) {
                 
-                // Preparamos los datos del usuario para enviar al frontend
+                // preparamos los datos para el front
                 Map<String, Object> usuarioDocente = new HashMap<>();
                 usuarioDocente.put("id", maestro.getId());
                 usuarioDocente.put("nombre", maestro.getNombre());
                 usuarioDocente.put("apellido", maestro.getApellido());
                 usuarioDocente.put("email", maestro.getEmail());
-                usuarioDocente.put("rol", "docente"); // <--- Importante para tu App.jsx
+                usuarioDocente.put("rol", "docente"); // importante para saber que menu mostrar
 
                 response.put("mensaje", "Login exitoso");
                 response.put("usuario", usuarioDocente);
@@ -61,7 +61,7 @@ public class AuthController {
             }
         }
 
-        // Si falla
+        // si falla
         return ResponseEntity.status(401).body(Map.of("error", "Credenciales incorrectas"));
     }
 }

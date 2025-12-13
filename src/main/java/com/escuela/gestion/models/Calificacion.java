@@ -3,8 +3,7 @@ package com.escuela.gestion.models;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-// Esta clase representa la nota final que se guarda en la base de datos.
-// Relaciona una calificación numérica con un alumno y una materia específica.
+// tabla para guardar la nota final del alumno en la materia
 @Entity
 @Table(name = "calificaciones")
 public class Calificacion {
@@ -12,23 +11,22 @@ public class Calificacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Aquí se almacena el número de la nota (ej: 8.5 o 10).
+    // usamos double porque puede tener decimales (ej. 8.5)
     private Double valor; 
 
-    // Indica a qué estudiante pertenece esta calificación.
+    // de quien es la calificacion jsonignoreproperties es vital para que no falle al serializar (lazy loading)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alumno_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Alumno alumno;
 
-    // Indica en qué curso o materia obtuvo esa nota.
+    // en que materia saco esta nota
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asignacion_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Asignacion asignacion;
 
-    // Getters y Setters OBLIGATORIOS
-    // Estos métodos permiten que otras partes del programa lean o modifiquen la nota.
+    // getters y setters 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Double getValor() { return valor; }
