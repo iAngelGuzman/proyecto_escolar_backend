@@ -156,7 +156,7 @@ public class AsistenciaController {
                         // contadores
                         if(a.getStatus().equals("presente")) totalPresentes++;
                         else if(a.getStatus().equals("ausente")) totalAusentes++;
-                        else if(a.getStatus().equals("tardanza")) totalRetardos++;
+                        else if(a.getStatus().equals("retardo")) totalRetardos++;
                     }
                 }
                 
